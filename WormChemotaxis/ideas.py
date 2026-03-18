@@ -27,6 +27,8 @@ if not os.path.exists(filepath):
     )
     quit()
 
+print(f"Loading dataset from: {filepath}...")
+
 with h5py.File(filepath, "r") as f:
     print("Loaded dataset from:", filepath)
     # List all datasets
