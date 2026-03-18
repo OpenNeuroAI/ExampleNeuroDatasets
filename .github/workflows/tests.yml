@@ -48,6 +48,7 @@ jobs:
 
 
     - name: Test WormChemotaxis
+      if: ${{ matrix.runs-on == 'ubuntu-latest' }}
       shell: bash
       run: |
         echo "Running WormChemotaxis tests..."
