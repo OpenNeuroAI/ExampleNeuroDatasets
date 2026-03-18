@@ -12,13 +12,12 @@ if not os.path.exists(filename):
     import requests
 
     r = requests.get(url)
-    with open(filename, 'wb') as f:
-        f.write(r.content)  
+    with open(filename, "wb") as f:
+        f.write(r.content)
 else:
     print("File %s already exists, skipping download" % filename)
-        
 
-    
+
 df = pd.read_excel(filename, sheet_name="Key to conditions")
 
 print(df.head())
@@ -26,5 +25,3 @@ print(df.head())
 df = pd.read_excel(filename, sheet_name="Fitness all conditions")
 
 print(df.head())
-
-
