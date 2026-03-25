@@ -60,10 +60,19 @@ def load_dataset(filepath, show_plot=True, save_plot=False, output_dir="."):
         base_coordinates = f["base_coordinates"][:]
         print(f"Base coordinates: {base_coordinates}")
 
+        tail_x = base_coordinates[:, 0]
+        print(tail_x.shape)
+        tail_y = base_coordinates[:, 1]
+        print(tail_x.shape)
+        print(
+            f"Tail coordinates: ({tail_x[0]}, {tail_y[0]}), ..., ({tail_x[-1]}, {tail_y[-1]})"
+        )
+
         neck_x = f["neck_x"][:]
+        print(neck_x.shape)
         neck_y = f["neck_y"][:]
         print(
-            f"Neck coordinates: ({neck_x[0]}, {neck_y[0]}, ..., {neck_x[-1]}, {neck_y[-1]})"
+            f"Neck coordinates: ({neck_x[0]}, {neck_y[0]}), ..., ({neck_x[-1]}, {neck_y[-1]})"
         )
 
         # Load odor patch coordinates
@@ -79,52 +88,59 @@ def load_dataset(filepath, show_plot=True, save_plot=False, output_dir="."):
     # Creating a 2D plot in matplotlib of the odor patch
     plt.figure(figsize=(6, 6))
 
-    if odor_patch is not None:
-        plt.plot(odor_patch[:, 0], odor_patch[:, 1], "y-", label="Odor patch boundary")
-
+    scale_mm = 1000  # Convert from microns to mm for plotting
     strange_scale = 13  # Why is this scaling factor needed? microns to pixels?
 
+    if odor_patch is not None:
+        plt.plot(
+            odor_patch[:, 0] / scale_mm,
+            odor_patch[:, 1] / scale_mm,
+            "y-",
+            label="Odor patch boundary",
+        )
+
     plt.scatter(
-        [i * strange_scale for i in traj_data["coord_x"]],
-        [i * strange_scale for i in traj_data["coord_y"]],
+        [i * strange_scale / scale_mm for i in traj_data["coord_x"]],
+        [i * strange_scale / scale_mm for i in traj_data["coord_y"]],
         s=1,
         c="blue",
         label=f"Worm centroid trajectory (x{strange_scale})",
     )
 
     plt.scatter(
-        neck_x,
-        neck_y,
+        tail_x / scale_mm,
+        tail_y / scale_mm,
         s=3,
-        c="black",
-        label="Worm neck trajectory",
+        c="lightblue",
+        label="Worm tail trajectory",
     )
 
     plt.scatter(
-        neck_x[0],
-        neck_y[0],
+        neck_x / scale_mm,
+        neck_y / scale_mm,
+        s=1,
+        c="green",
+        label="Worm neck trajectory",
+    )
+
+    # Highlight the start and end points of the neck trajectory
+    plt.scatter(
+        neck_x[0] / scale_mm,
+        neck_y[0] / scale_mm,
         s=64,
         c="lightgreen",
         label="Start",
     )
     plt.scatter(
-        neck_x[-1],
-        neck_y[-1],
+        neck_x[-1] / scale_mm,
+        neck_y[-1] / scale_mm,
         s=64,
         c="red",
         label="End",
     )
 
-    plt.scatter(
-        base_coordinates[:, 0],
-        base_coordinates[:, 1],
-        s=1,
-        c="green",
-        label="Base coordinates",
-    )
-
-    plt.xlabel("X Coordinate")
-    plt.ylabel("Y Coordinate")
+    plt.xlabel("x coordinate (mm)")
+    plt.ylabel("y coordinate (mm)")
 
     plt.title("Dataset: %s" % filepath.split("/")[-2])
     plt.legend()
